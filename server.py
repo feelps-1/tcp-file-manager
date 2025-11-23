@@ -88,6 +88,9 @@ def handle_client(conn, addr):
                 files = os.listdir(STORAGE_DIR)
                 pass
 
+            elif cmd == "EXIT":
+                connected = False
+
         except Exception as e:
             print(f"[ERRO] Erro na conexão com {addr}: {e}")
             connected = False
