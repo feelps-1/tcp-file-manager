@@ -30,7 +30,7 @@ def handle_upload(conn, filename, filesize):
                 bytes_received += len(data)
 
         print(f"[UPLOAD] Arquivo {filename} recebido com sucesso")
-        conn.send("SUCESS".encode())
+        conn.send("SUCCESS".encode())
     except Exception as e:
         print(f"[ERRO - UPLOAD] {e}")
         conn.send("ERROR".encode())

@@ -92,7 +92,7 @@ def upload_file(s, filename):
                 s.sendall(bytes_read)
         
         final_status = s.recv(1024).decode()
-        if final_status == "SUCESS":
+        if final_status == "SUCCESS":
             print(f"[UPLOAD] Arquivo '{filename}' enviado com sucesso!")
         else:
             print(f"[UPLOAD] Erro ao salvar arquivo no servidor: {final_status}")
@@ -133,8 +133,9 @@ def download_file(s, filename):
 
         elif status == "ERROR":
             error_msg = resp_parts[1] if len(resp_parts) > 1 else "Erro desconhecido."
-        else: 
             print(f"[DOWNLOAD] Erro: {error_msg}")
+        else: 
+            print(f"[DOWNLOAD] Resposta inesperada do servidor: {response}")
 
     except Exception as e:
         print(f"[ERRO - DOWNLOAD] Falha ao receber arquivo: {e}")
