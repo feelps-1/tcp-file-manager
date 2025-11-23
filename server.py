@@ -35,6 +35,30 @@ def handle_upload(conn, filename, filesize):
         print(f"[ERRO - UPLOAD] {e}")
         conn.send("ERROR".encode())
 
+def handle_download(conn, filename):
+    filepath = os.path.join(STORAGE_DIR, filename)
+
+    if os.path.exists(filepath):
+        filesize = os.path.getsize(filepath)
+        conn.send(f"EXISTS{SEPARATOR}{filesize}".encode())
+
+        conn.recv(1024)
+
+        try:
+            with open(filepath, "rb") as f:
+                while True:
+                    bytes_read = f.read(BUFFER_SIZE)
+                    if not bytes_read:
+                        break
+                    conn.sendall(bytes_read)
+            
+            print(f"[DOWNLOAD] Arquivo {filename} enviado")
+        except Exception as e:
+            print(f"[ERRO DOWNLOAD] {e}")
+    else:
+        conn.send(f"ERROR{SEPARATOR}Arquivo não encontrado".encode())
+
+
 def handle_client(conn, addr):
     print(f"[NOVA CONEXÃO] {addr} conectado.")
     
@@ -56,8 +80,8 @@ def handle_client(conn, addr):
                 handle_upload(conn, filename, filesize)
             
             elif cmd == 'DOWNLOAD':
-                # TODO: Verificar se arquivo existe, enviar cabeçalho e depois o arquivo
-                pass
+                filename = os.path.basename(cmd_parts[1])
+                handle_download(conn, filename)
             
             elif cmd == 'LIST':
                 # TODO: Listar arquivos em STORAGE_DIR e enviar lista para o cliente
