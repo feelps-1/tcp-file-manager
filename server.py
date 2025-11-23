@@ -58,6 +58,14 @@ def handle_download(conn, filename):
     else:
         conn.send(f"ERROR{SEPARATOR}Arquivo não encontrado".encode())
 
+def handle_list(conn):
+    try:
+        files = os.listdir(STORAGE_DIR)
+        files_str = ";".join(files) if files else "Nenhum arquivo armazenado"
+        conn.send(files_str.encode())
+    except Exception as e:
+        conn.send(f"Erro ao listar: {e}".encode())
+
 
 def handle_client(conn, addr):
     print(f"[NOVA CONEXÃO] {addr} conectado.")
@@ -84,8 +92,7 @@ def handle_client(conn, addr):
                 handle_download(conn, filename)
             
             elif cmd == 'LIST':
-                # TODO: Listar arquivos em STORAGE_DIR e enviar lista para o cliente
-                files = os.listdir(STORAGE_DIR)
+                handle_list(conn)
                 pass
 
             elif cmd == "EXIT":
