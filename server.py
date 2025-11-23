@@ -1,0 +1,87 @@
+import socket
+import threading
+import os
+
+HOST = '0.0.0.0' 
+PORT = 5000
+BUFFER_SIZE = 4096
+SEPARATOR = "|"
+STORAGE_DIR = 'server_files'
+
+if not os.path.exists(STORAGE_DIR):
+    os.makedirs(STORAGE_DIR)
+
+def handle_upload(conn, filename, filesize):
+    filepath = os.path.join(STORAGE_DIR, filename)
+
+    conn.send("OK".encode())
+
+    try:
+        with open(filepath, "wb") as f:
+            bytes_received = 0
+            while bytes_received < filesize:
+                bytes_to_read = min(BUFFER_SIZE, filesize - bytes_received)
+                data = conn.recv(bytes_to_read)
+
+                if not data:
+                    break
+
+                f.write(data)
+                bytes_received += len(data)
+
+        print(f"[UPLOAD] Arquivo {filename} recebido com sucesso")
+        conn.send("SUCESS".encode())
+    except Exception as e:
+        print(f"[ERRO - UPLOAD] {e}")
+        conn.send("ERROR".encode())
+
+def handle_client(conn, addr):
+    print(f"[NOVA CONEXÃO] {addr} conectado.")
+    
+    connected = True
+    while connected:
+        try:
+            data = conn.recv(1024).decode()
+            if not data:
+                break
+
+            cmd = data.split()[0]
+
+            cmd_parts = cmd.split(SEPARATOR)
+            cmd = cmd_parts[0]
+
+            if cmd == 'UPLOAD':
+                filename = os.path.basename(cmd_parts[1])
+                filesize = int(cmd_parts[2])
+                handle_upload(conn, filename, filesize)
+            
+            elif cmd == 'DOWNLOAD':
+                # TODO: Verificar se arquivo existe, enviar cabeçalho e depois o arquivo
+                pass
+            
+            elif cmd == 'LIST':
+                # TODO: Listar arquivos em STORAGE_DIR e enviar lista para o cliente
+                files = os.listdir(STORAGE_DIR)
+                pass
+
+        except Exception as e:
+            print(f"[ERRO] Erro na conexão com {addr}: {e}")
+            connected = False
+    
+    conn.close()
+    print(f"[DESCONECTADO] {addr} saiu.")
+
+def start():
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind((HOST, PORT))
+    server.listen()
+    print(f"[OUVINDO] Servidor rodando em {HOST}:{PORT}")
+
+    while True:
+        conn, addr = server.accept()
+        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        thread.start()
+        print(f"[ATIVAS] Conexões ativas: {threading.active_count() - 1}")
+
+if __name__ == "__main__":
+    start()
