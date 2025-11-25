@@ -4,7 +4,6 @@ import socket
 import sys
 import os
 import io
-import threading
 import client_core
 
 class FileClientGUI:
