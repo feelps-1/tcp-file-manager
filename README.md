@@ -127,7 +127,7 @@ A interface gráfica oferece:
 - Botão **"Enviar (UPLOAD)"** - Abre diálogo para selecionar arquivo a enviar
 - **Log de Operações** - Mostra o histórico de ações realizadas
 
-## 🔧 Configuração
+## Configuração
 
 ### Alterar Host e Porta
 
@@ -157,7 +157,7 @@ O tamanho do buffer de transferência pode ser ajustado:
 BUFFER_SIZE = 4096  # 4KB
 ```
 
-## 🌐 Funcionamento do Sistema
+## Funcionamento do Sistema
 
 ### Protocolo de Comunicação
 
